@@ -683,3 +683,5 @@ MigrationBackup/
 
 ## Custom .gitignore
 .vscode/
+*/epoch_save_model/
+*/reg/

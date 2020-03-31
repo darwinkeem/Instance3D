@@ -188,7 +188,7 @@ class Trainer:
             X = [x.to(self.device) for x in X]
         else:
             X = X.to(self.device)
-        y = y.to(self.device)
+        y = y.to(self.device).unsqueeze(-1)
         pred = self.model(X)
         loss = self.loss_fn(pred, y)
         self.optimizer.zero_grad()
@@ -221,7 +221,7 @@ class Trainer:
                 X = [x.to(self.device) for x in X]
             else:
                 X = X.to(self.device)
-            y = y.to(self.device)
+            y = y.to(self.device).unsqueeze(-1)
             pred = self.model(X)
             loss = self.loss_fn(pred, y)
             score = self.objective_metric(pred, y)

@@ -1,7 +1,7 @@
 import argparse
 
 from instance3d.dataset import Instance
-from instance3d.model import FC
+from instance3d.models import FC, Conv3D
 from instance3d.trainer import Trainer
 
 import torch
@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    '--batch_size', type=int, default=2
+    '--batch_size', type=int, default=200
 )
 parser.add_argument(
     '--epoch', type=int, default=40
@@ -23,17 +23,17 @@ parser.add_argument(
     '--dataset', type=str, default='./data/'
 )
 parser.add_argument(
-    '--workers', type=int, default=4
+    '--workers', type=int, default=1
 )
 parser.add_argument(
     '--save_model', type=str, default='./save_model/'
 )
 
 cfg = parser.parse_args()
-print(cfg)
+# print(cfg)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-print(device)
+# print(device)
 
 if __name__ == "__main__":
     ds_train = Instance(root=cfg.dataset, split='train', transform=None)
@@ -42,10 +42,10 @@ if __name__ == "__main__":
     dl_test = DataLoader(ds_test, batch_size=cfg.batch_size, shuffle=False, num_workers=cfg.workers)
     print("DATA LOADED")
 
-    model = FC(8*8*4, 1)
+    model = Conv3D(4, 1)
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
-    criterion = nn.MSELoss
-    success_metric = nn.MSELoss
+    criterion = nn.MSELoss()
+    success_metric = nn.MSELoss()
 
     trainer = Trainer(model, criterion, optimizer, success_metric, device, None)
     fit = trainer.fit(dl_train, dl_test, num_epochs=cfg.epoch, checkpoints=cfg.save_model+model.__class__.__name__+'.pt')

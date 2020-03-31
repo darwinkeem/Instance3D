@@ -28,11 +28,13 @@ class Instance(Dataset):
 
     def __getitem__(self, index):
         X = self.items[index][1:-1]
-        X = torch.from_numpy(X)
+        X = np.array(X, dtype=float)
+        X = torch.from_numpy(X).float()
         X = X.view(4, 8, 8)
 
         y = self.items[index][-1]
-        y = torch.from_numpy(y)
+        y = np.array(y, dtype=float)
+        y = torch.from_numpy(y).float()
 
         sample = (X, y)
 
