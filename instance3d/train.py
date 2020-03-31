@@ -1,10 +1,11 @@
 import argparse
 
 from instance3d.dataset import Instance
-from instance3d.models import FC
+from instance3d.model import FC
 from instance3d.trainer import Trainer
 
 import torch
+import torch.nn as nn
 from torch.utils.data import DataLoader
 
 
@@ -41,5 +42,16 @@ if __name__ == "__main__":
     dl_test = DataLoader(ds_test, batch_size=cfg.batch_size, shuffle=False, num_workers=cfg.workers)
     print("DATA LOADED")
 
-    model = FC()
+    model = FC(8*8*4, 1)
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+    criterion = nn.MSELoss
+    success_metric = nn.MSELoss
+
+    trainer = Trainer(model, criterion, optimizer, success_metric, device, None)
+    fit = trainer.fit(dl_train, dl_test, num_epochs=cfg.epoch, checkpoints=cfg.save_model+model.__class__.__name__+'.pt')
+    torch.save(model.state_dict(), './reg/final_state_dict.pt')
+    torch.save(model, './reg/final.pt')
+
+    loss_fn_name = "Mean Square Error"
+    best_score = str(fit.best_score)
+    print(f"Best loss score(loss function = {loss_fn_name}): {best_score}")
